@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Moss Merrytime Music Timeline</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Font similar to mossww.com -->
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --moss-teal: #006a6f;
+      --moss-teal-dark: #004b4f;
+      --moss-card-bg: #ffffff;
+      --moss-accent: #e2f1f3;
+      --danger: #c62828;
+      --success: #2e7d32;
+    }
+	
+	.song-item.playing {
+	  border: 3px solid #2e7d32;   /* Moss green */
+	  background: #e8f5e9;         /* light green tint */
+	}
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Source Sans Pro", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #00121a 0%, #033644 60%, #071f35 100%);
+      min-height: 100vh;
+      color: #102027;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+.guess-input:focus {
+  outline: none;
+  border-color: var(--moss-teal);
+  box-shadow: 0 0 0 1px rgba(0, 106, 111, 0.25);
+}
+
+
+    .background-image {
+      position: fixed;
+      inset: 0;
+      background: url("julekuler.jpg") center bottom / cover no-repeat;
+      filter: brightness(0.3);
+      z-index: -2;
+    }
+
+    .bg-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at top, rgba(255,255,255,0.15), transparent 55%),
+                  linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.85));
+      z-index: -1;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 1100px;
+      margin: 24px;
+      display: flex;
+      flex-direction: column;
+      background: rgba(244, 247, 248, 0.96);
+      border-radius: 18px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+      overflow: hidden;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      padding: 14px 22px;
+      background: var(--moss-teal);
+      color: white;
+    }
+
+    header img.logo {
+      height: 40px;
+      width: 40px;
+      margin-right: 14px;
+      border-radius: 20%;
+      background: white;
+      padding: 4px;
+    }
+
+    header .title-block {
+      display: flex;
+      flex-direction: column;
+    }
+
+    header .title-block span.company {
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      font-size: 11px;
+      opacity: 0.8;
+    }
+
+    header .title-block span.app-title {
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    main {
+      padding: 22px;
+      display: flex;
+      flex: 1;
+      gap: 22px;
+      flex-wrap: wrap;
+    }
+
+    .card {
+      background: var(--moss-card-bg);
+      border-radius: 14px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      padding: 18px 18px 20px;
+    }
+
+    .card-header {
+      border-bottom: 1px solid #dde4e7;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .card-header h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--moss-teal-dark);
+    }
+
+    .card-header span.sub {
+      font-size: 13px;
+      color: #546e7a;
+    }
+
+    /* Start screen */
+
+    #start-screen {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      gap: 22px;
+      flex-wrap: wrap;
+    }
+
+#start-left {
+  flex: 1 1 260px;
+}
+
+#start-right {
+  flex: 2 1 600px;   /* wider image column */
+}
+
+    .hero-image {
+      border-radius: 12px;
+      overflow: hidden;
+      height: 100%;
+      min-height: 240px;
+      background: #000;
+    }
+
+    .hero-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: saturate(1.05);
+    }
+
+    .field-group { margin-bottom: 14px; }
+
+    label {
+      display: block;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #455a64;
+      margin-bottom: 4px;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid #cfd8dc;
+      font-size: 15px;
+      font-family: inherit;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus {
+      outline: none;
+      border-color: var(--moss-teal);
+      box-shadow: 0 0 0 1px rgba(0, 106, 111, 0.2);
+    }
+
+    .helper {
+      font-size: 13px;
+      color: #607d8b;
+    }
+
+    .error-text {
+      font-size: 13px;
+      color: var(--danger);
+      margin-top: 4px;
+      display: none;
+    }
+
+    button {
+      font-family: inherit;
+      font-size: 15px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      padding: 8px 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+    }
+
+    .btn-primary {
+      background: var(--moss-teal);
+      color: white;
+      box-shadow: 0 4px 10px rgba(0, 106, 111, 0.35);
+    }
+
+    .btn-primary:disabled {
+      background: #90a4ae;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      font-size: 11px;
+      border-radius: 999px;
+      background: var(--moss-accent);
+      color: var(--moss-teal-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    /* Game layout */
+
+    #game-screen {
+      display: none;
+      width: 100%;
+    }
+
+    #game-main {
+      flex: 1 1 100%;
+      min-width: 320px;
+	  margin-right: 420px; 
+    }
+
+    #game-main-inner {
+      display: flex;
+      gap: 16px;
+      align-items: stretch;
+      margin-top: 8px;
+    }
+
+    .arrow-column {
+      width: 80px;
+      background: rgba(0, 106, 111, 0.05);
+      border-radius: 10px;
+      border: 1px solid rgba(0, 106, 111, 0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--moss-teal-dark);
+      text-align: center;
+      padding: 8px;
+    }
+
+    .arrow-icon {
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+
+    .arrow-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .list-column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .song-list {
+      border-radius: 10px;
+      padding: 10px;
+      background: #f0f5f6;
+      border: 1px solid #d1dde0;
+      min-height: 60px;
+      flex: 1;
+    }
+
+    .song-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      margin-bottom: 6px;
+      background: white;
+      border-radius: 8px;
+      border: 1px solid #cfd8dc;
+      cursor: move;
+      user-select: none;
+      transition: background 0.1s ease, transform 0.1s ease, box-shadow 0.1s ease;
+    }
+
+    .song-item:last-child { margin-bottom: 0; }
+
+    .song-item.dragging {
+      opacity: 0.6;
+      transform: scale(1.01);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .drag-handle {
+      font-size: 18px;
+      color: #90a4ae;
+    }
+
+    .song-text-block {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .song-label {
+      font-weight: 600;
+      color: #37474f;
+    }
+
+    .song-item .hint {
+      font-size: 12px;
+      color: #90a4ae;
+    }
+
+    .song-meta {
+      font-size: 12px;
+      color: #455a64;
+      display: none; /* revealed after submit */
+      margin-top: 2px;
+    }
+
+    .song-item button.play-btn {
+      margin-left: auto;
+      border-radius: 999px;
+      background: #eceff1;
+      color: #263238;
+      border: 1px solid #cfd8dc;
+      padding: 4px 10px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .song-item.correct {
+      border-color: var(--success);
+      background: #dcedc8;
+    }
+
+    .song-item.wrong {
+      border-color: var(--danger);
+      background: #ffcdd2;
+    }
+
+    #result {
+      margin-top: 8px;
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    #result.good { color: var(--success); }
+    #result.bad  { color: var(--danger); }
+
+    .audio-panel {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #fafafa;
+      border: 1px solid #cfd8dc;
+      font-size: 13px;
+      color: #455a64;
+    }
+
+    .audio-panel strong {
+      color: var(--moss-teal-dark);
+    }
+
+    #audio-player {
+      width: 100%;
+      margin-top: 6px;
+    }
+
+    .team-label {
+      font-size: 15px;
+      color: #263238;
+      margin-bottom: 6px;
+    }
+
+    .team-label strong {
+      color: var(--moss-teal-dark);
+    }
+
+    .timer-display {
+      font-family: "Source Sans Pro", monospace;
+      font-weight: 700;
+      font-size: 32px;
+      color: #d32f2f;
+      text-align: right;
+      margin-bottom: 6px;
+    }
+
+    .timer-display.time-up {
+      color: #b71c1c;
+    }
+
+    @media (max-width: 768px) {
+      main { padding: 16px; }
+      header { padding-inline: 16px; }
+      #game-main-inner { gap: 10px; }
+      .arrow-column { width: 60px; }
+      .arrow-icon { font-size: 32px; }
+      .arrow-label { font-size: 11px; }
+      .timer-display { font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="background-image"></div>
+  <div class="bg-overlay"></div>
+
+  <div class="app-shell">
+    <header>
+      <img src="moss-logo.png" alt="Moss Maritime logo" class="logo" />
+      <div class="title-block">
+                <span class="app-title">Moss Merrytime Music Timeline</span>
+      </div>
+    </header>
+
+    <main>
+      <!-- START SCREEN -->
+      <section id="start-screen">
+        <div id="start-left" class="card">
+          <div class="card-header">
+            <h2>'Tis the Season!</h2>
+                      </div>
+          <p class="helper">
+            Her er oppgaven å arrangere 10 sanger fra <strong>eldst</strong> til
+            <strong>nyest</strong>. Men først, skriv inn lagnavnet deres.   </p>
+
+          <div class="field-group">
+            <label for="team-name">Lagnavn</label>
+            <input type="text" id="team-name" />
+            <div id="team-error" class="error-text">Fyll inn et lagnavn.</div>
+          </div>
+
+          <div class="field-group">
+            <label for="minutes-input">Tidsbegrensning</label>
+            <input type="number" id="minutes-input" min="1" max="120" value="10" />
+            <div id="minutes-error" class="error-text">Please enter number of minutes (at least 1).</div>
+          </div>
+
+          <p class="helper">
+  
+          </p>
+
+          <button id="start-btn" class="btn-primary" disabled>
+            Nå kjører vi! →
+          </button>
+        </div>
+
+        <div id="start-right" class="card">
+          <div class="hero-image">
+            <img src="julekuler.jpg" alt="Christmas tree on vessel in harbour" />
+          </div>
+        </div>
+      </section>
+
+      <!-- GAME SCREEN -->
+      <section id="game-screen">
+        <div id="game-layout" style="display:flex; gap:22px; width:100%;">
+  
+  <!-- LEFT: MAIN GAME -->
+  <div id="game-main" class="card" style="flex:1;">
+    <div class="card-header">
+      <h2>Arranger sangene</h2>
+      <span class="sub">Flytt hver sang: øverst = eldst, nederst = nyest</span>
+    </div>
+
+    <div id="timer" class="timer-display">00:00</div>
+    <div id="team-display" class="team-label"></div>
+
+    <div id="game-main-inner">
+      <div class="arrow-column">
+        <div class="arrow-icon">↓</div>
+        <div class="arrow-label">Nederst: Nyest</div>
+      </div>
+
+      <div class="list-column">
+        <div id="song-list" class="song-list"></div>
+        <button id="check-btn" class="btn-primary" style="margin-top: 12px;">
+          Send inn svar
+        </button>
+        <div id="result"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT-SIDE AUDIO PANEL -->
+	<div id="audio-column" class="card"
+		 style="
+		   width:400px;
+		   height:fit-content;
+		   position:fixed;
+		   right:20px;
+		   top:20px;
+		   z-index:999;
+		 ">
+		<div class="card-header">
+		  <h2>Spiller</h2>
+		</div>
+
+		<div id="now-playing" style="margin-bottom:8px; font-weight:600; color:#37474f;"></div>
+
+		<audio id="audio-player" controls style="width:100%;">
+		  Your browser does not support audio.
+		</audio>
+	  </div>
+
+	</div>
+
+
+                </section>
+    </main>
+  </div>
+
+  <script>
+    // ===========================
+    // CONFIGURE YOUR SONGS HERE
+    // ===========================
+    //
+    // Add artist & title for each:
+    // { id, label, file, year, artist, title }
+
+    const songs = [
+      { id: 1,  label: "Sang A", file: "a.m4a",  year: 1997, artist: "Daft Punk", title: "Around the World" },
+      { id: 2,  label: "Sang B", file: "b.m4a",  year: 1969, artist: "Creedence Clearwater Revival", title: "Fortunate Son" },
+      { id: 3,  label: "Sang C", file: "c.m4a",  year: 1979, artist: "Abba", title: "Gimme! Gimme! Gimme! (A Man after Midnight)" },
+      { id: 4,  label: "Sang D", file: "d.m4a",  year: 1972, artist: "Deep Purple", title: "Highway Star" },
+      { id: 5,  label: "Sang E", file: "e.m4a",  year: 1984, artist: "Wham!", title: "Last Christmas" },
+      { id: 6,  label: "Sang F", file: "f.m4a",  year: 1975, artist: "Fleetwood Mac", title: "Rhiannon" },
+      { id: 7,  label: "Sang G", file: "g.m4a",  year: 1993, artist: "Nirvana", title: "Serve the Servants" },
+      { id: 8,  label: "Sang H", file: "h.m4a",  year: 1991, artist: "Red Hot Chili Peppers", title: "Under the Bridge" },
+      { id: 9,  label: "Sang I", file: "i.m4a",  year: 1983, artist: "THX", title: "Deep Note" },
+      { id: 10, label: "Sang J", file: "j.m4a", year: 1987, artist: "Guns N' Roses", title: "Sweet Child O' Mine" }
+    ];
+
+    const songById = {};
+    songs.forEach(s => { songById[s.id] = s; });
+
+    const startScreen = document.getElementById("start-screen");
+    const gameScreen = document.getElementById("game-screen");
+    const startBtn = document.getElementById("start-btn");
+    const teamInput = document.getElementById("team-name");
+    const minutesInput = document.getElementById("minutes-input");
+    const teamError = document.getElementById("team-error");
+    const minutesError = document.getElementById("minutes-error");
+    const teamDisplay = document.getElementById("team-display");
+    const songListEl = document.getElementById("song-list");
+    const audioPlayer = document.getElementById("audio-player");
+    const checkBtn = document.getElementById("check-btn");
+    const resultEl = document.getElementById("result");
+    const timerEl = document.getElementById("timer");
+
+    let currentTeamName = "";
+    let dragSrcEl = null;
+    let hasSubmitted = false;
+    let timerInterval = null;
+    let remainingSeconds = 0;
+
+    function updateStartEnabled() {
+      const hasName = teamInput.value.trim().length > 0;
+      const mins = parseInt(minutesInput.value, 10);
+      const hasMins = !isNaN(mins) && mins > 0;
+      startBtn.disabled = !(hasName && hasMins);
+      if (hasName) teamError.style.display = "none";
+      if (hasMins) minutesError.style.display = "none";
+    }
+
+    teamInput.addEventListener("input", updateStartEnabled);
+    minutesInput.addEventListener("input", updateStartEnabled);
+
+    startBtn.addEventListener("click", () => {
+      const name = teamInput.value.trim();
+      const mins = parseInt(minutesInput.value, 10);
+
+      let valid = true;
+      if (!name) {
+        teamError.style.display = "block";
+        valid = false;
+      }
+      if (isNaN(mins) || mins <= 0) {
+        minutesError.style.display = "block";
+        valid = false;
+      }
+      if (!valid) return;
+
+      currentTeamName = name;
+      teamDisplay.innerHTML = `Lag: <strong>${escapeHtml(currentTeamName)}</strong>`;
+      startScreen.style.display = "none";
+      gameScreen.style.display = "block";
+
+      startTimer(mins);
+    });
+
+    function startTimer(minutes) {
+      if (timerInterval) clearInterval(timerInterval);
+      remainingSeconds = Math.max(0, Math.floor(minutes * 60));
+      timerEl.classList.remove("time-up");
+      renderTimer();
+
+      timerInterval = setInterval(() => {
+        remainingSeconds -= 1;
+        if (remainingSeconds <= 0) {
+          remainingSeconds = 0;
+          renderTimer();
+          clearInterval(timerInterval);
+          timerInterval = null;
+          timerEl.classList.add("time-up");
+          // Auto-submit if not already submitted
+          if (!hasSubmitted) {
+            handleSubmit(true);
+          }
+          return;
+        }
+        renderTimer();
+      }, 1000);
+    }
+
+    function stopTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+
+    function renderTimer() {
+      const m = Math.floor(remainingSeconds / 60);
+      const s = remainingSeconds % 60;
+      timerEl.textContent = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+    }
+
+    // Shuffle helper
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function createSongItem(song) {
+  const item = document.createElement("div");
+  item.className = "song-item";
+  item.draggable = true;
+  item.dataset.id = String(song.id);
+
+  const handle = document.createElement("span");
+  handle.className = "drag-handle";
+  handle.textContent = "☰";
+
+  const label = document.createElement("div");
+  label.className = "song-label";
+  label.textContent = song.label;
+
+  const hint = document.createElement("div");
+  hint.className = "hint";
+  hint.textContent = "Trekk for å flytte";
+
+  /* ➤ NEW: user text input field */
+  const guessInput = document.createElement("input");
+  guessInput.type = "text";
+  guessInput.placeholder = "Notater…";
+  guessInput.className = "guess-input";
+  guessInput.style.marginTop = "6px";
+  guessInput.style.padding = "6px 8px";
+  guessInput.style.border = "1px solid #cfd8dc";
+  guessInput.style.borderRadius = "6px";
+  guessInput.style.fontSize = "13px";
+  guessInput.style.width = "100%";
+
+  const meta = document.createElement("div");
+  meta.className = "song-meta";
+  meta.textContent = "";
+  meta.style.marginTop = "4px";
+
+  const textBlock = document.createElement("div");
+  textBlock.className = "song-text-block";
+  textBlock.appendChild(label);
+  textBlock.appendChild(hint);
+  textBlock.appendChild(guessInput);   // ← NEW INPUT FIELD
+  textBlock.appendChild(meta);
+
+  const playBtn = document.createElement("button");
+  playBtn.className = "play-btn";
+  playBtn.type = "button";
+  playBtn.textContent = "Spill av";
+  playBtn.addEventListener("click", () => playSong(song.file, song.label));
+
+  item.appendChild(handle);
+  item.appendChild(textBlock);
+  item.appendChild(playBtn);
+
+  addDragAndDropEvents(item);
+  return item;
+}
+
+
+    function addDragAndDropEvents(item) {
+      item.addEventListener("dragstart", (e) => {
+        dragSrcEl = item;
+        item.classList.add("dragging");
+        e.dataTransfer.effectAllowed = "move";
+      });
+
+      item.addEventListener("dragend", () => {
+        item.classList.remove("dragging");
+      });
+
+      item.addEventListener("dragover", (e) => {
+        e.preventDefault();
+      });
+
+      item.addEventListener("drop", (e) => {
+        e.preventDefault();
+        if (!dragSrcEl || dragSrcEl === item) return;
+        const children = Array.from(songListEl.children);
+        const srcIndex = children.indexOf(dragSrcEl);
+        const targetIndex = children.indexOf(item);
+        if (srcIndex < targetIndex) {
+          songListEl.insertBefore(dragSrcEl, item.nextSibling);
+        } else {
+          songListEl.insertBefore(dragSrcEl, item);
+        }
+      });
+    }
+
+    songListEl.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      const dragging = document.querySelector(".song-item.dragging");
+      if (!dragging) return;
+
+      const afterElement = getDragAfterElement(songListEl, e.clientY);
+      if (afterElement == null) {
+        songListEl.appendChild(dragging);
+      } else {
+        songListEl.insertBefore(dragging, afterElement);
+      }
+    });
+
+    function getDragAfterElement(container, y) {
+      const draggableElements = [...container.querySelectorAll(".song-item:not(.dragging)")];
+
+      return draggableElements.reduce(
+        (closest, child) => {
+          const box = child.getBoundingClientRect();
+          const offset = y - (box.top + box.height / 2);
+          if (offset < 0 && offset > closest.offset) {
+            return { offset, element: child };
+          } else {
+            return closest;
+          }
+        },
+        { offset: Number.NEGATIVE_INFINITY, element: null }
+      ).element;
+    }
+
+
+function playSong(file, label) {
+  // ALWAYS reset all play buttons and playing highlights
+  document.querySelectorAll(".play-btn").forEach(btn => {
+    btn.textContent = "Spill av";
+  });
+  document.querySelectorAll(".song-item").forEach(item => {
+    item.classList.remove("playing");
+  });
+
+  // Set new audio source
+  audioPlayer.src = file;
+
+  // Play and update UI
+  audioPlayer.play().catch(err => {
+    console.error("Audio play error:", err);
+    alert("Could not play audio. Check that the file exists and your browser allows audio.");
+  });
+
+  // Highlight the correct card + update play button text
+  const items = document.querySelectorAll(".song-item");
+  items.forEach(item => {
+    const labelEl = item.querySelector(".song-label");
+    if (labelEl.textContent === label) {
+      item.classList.add("playing");
+      const btn = item.querySelector(".play-btn");
+      btn.textContent = "Spiller...";
+    }
+  });
+
+  // Display clip label in the playbar
+  document.getElementById("now-playing").textContent =
+    `Spilles: ${label}`;
+
+  // When playback ends — reset
+  audioPlayer.onended = () => {
+    document.querySelectorAll(".play-btn").forEach(btn => {
+      btn.textContent = "Play";
+    });
+    document.querySelectorAll(".song-item").forEach(item => {
+      item.classList.remove("playing");
+    });
+    document.getElementById("now-playing").textContent = "";
+  };
+}
+
+
+function playSong_old(file, label) {
+  // Reset all play buttons
+  document.querySelectorAll(".play-btn").forEach(btn => {
+    btn.textContent = "Spill av";
+  });
+
+  // Identify the correct song from its label
+  const song = songs.find(s => s.label === label);
+
+  // Update audio source & play
+  audioPlayer.src = file;
+  audioPlayer.play().catch(err => {
+    console.error("Audio play error:", err);
+    alert("Could not play audio. Check that the file exists and your browser allows audio.");
+  });
+
+  // Update the clicked button text
+  const items = document.querySelectorAll(".song-item");
+  items.forEach(item => {
+    if (item.querySelector(".song-label").textContent === label) {
+      const btn = item.querySelector(".play-btn");
+      btn.textContent = "Playing...";
+    }
+  });
+
+  // Update the "Now playing" display
+  document.getElementById("now-playing").textContent =
+    `${song.label}: ${song.artist} – ${song.title}`;
+  
+  // When audio stops, reset button label
+  audioPlayer.onended = () => {
+    document.querySelectorAll(".play-btn").forEach(btn => {
+      btn.textContent = "Spill av";
+    });
+    document.getElementById("now-playing").textContent = "";
+  };
+}
+
+    // Shared submit handler for manual & auto
+    function handleSubmit(auto) {
+		if (hasSubmitted) return;
+
+		const items = Array.from(songListEl.children);
+		const idsInOrder = items.map(el => Number(el.dataset.id));
+
+		const correctOrderIds = [...songs]
+		.sort((a, b) => a.year - b.year)
+		.map(s => s.id);
+
+		// ===========================
+		// LONGEST CONTIGUOUS NON-DECREASING RUN
+		// ===========================
+
+		// Turn user ordering into years
+		const years = idsInOrder.map(id => songById[id].year);
+
+		// Track longest chain
+		let bestStart = 0;
+		let bestLength = 1;
+
+		let currentStart = 0;
+		let currentLength = 1;
+
+		for (let i = 1; i < years.length; i++) {
+		  if (years[i] >= years[i - 1]) {
+			// Still non-decreasing → extend the current chain
+			currentLength++;
+
+			if (currentLength > bestLength) {
+			  bestLength = currentLength;
+			  bestStart = currentStart;
+			}
+		  } else {
+			// Break in sequence → restart
+			currentStart = i;
+			currentLength = 1;
+		  }
+		}
+
+		// The winning chain indices
+		const chainIndices = new Set();
+		for (let i = bestStart; i < bestStart + bestLength; i++) {
+		  chainIndices.add(i);
+		}
+
+		const chainLength = bestLength;
+
+
+		// Step 3: Reveal metadata + optional coloring
+		items.forEach((item, index) => {
+		  item.classList.remove("correct", "wrong");
+
+		  const songId = idsInOrder[index];
+		  const songData = songById[songId];
+
+		  // Reveal metadata
+		  const metaDiv = item.querySelector(".song-meta");
+		  metaDiv.style.display = "block";
+		  metaDiv.textContent = `${songData.artist} – ${songData.title} (${songData.year})`;
+
+		  // Highlight the contiguous non-decreasing chain
+		  if (chainIndices.has(index)) {
+			item.classList.add("correct");   // green card
+		  } else {
+			item.classList.add("wrong");     // red card
+		  }
+		});
+
+
+
+		let message;
+		message = `${currentTeamName}, deres lengste korrekte rekkefølge ble ${chainLength} sanger.`;
+		resultEl.className = chainLength >= 3 ? "good" : "bad";
+		resultEl.textContent = message;
+
+		// Popup text differs if auto (time's up) or manual
+		if (auto) {
+		alert(`Tidne er ute! Deres lengste korrekte rekkefølge ble ${chainLength} sanger.`);
+		} else {
+		alert(message);
+		}
+
+		hasSubmitted = true;
+		checkBtn.disabled = true;
+		checkBtn.textContent = "Submitted";
+		checkBtn.style.opacity = "0.7";
+
+		// Stop timer after submit
+		stopTimer();
+		timerEl.classList.add("time-up");
+	}
+
+    checkBtn.addEventListener("click", () => {
+      if (hasSubmitted) return;
+
+      const confirmSend = window.confirm(
+        `Send inn svar for lag "${currentTeamName}"? Dere kan ikke endre rekkefølgen etterpå.`
+      );
+      if (!confirmSend) return;
+
+      handleSubmit(false);
+    });
+
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, function (m) {
+        return ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;"
+        })[m];
+      });
+    }
+
+    // Initial render (shuffled)
+    (function init() {
+      const shuffled = shuffle(songs);
+      shuffled.forEach(song => {
+        const item = createSongItem(song);
+        songListEl.appendChild(item);
+      });
+      renderTimer(); // initial 00:00
+    })();
+  </script>
+</body>
+</html>

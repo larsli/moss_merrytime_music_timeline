@@ -803,6 +803,60 @@
       ).element;
     }
 
+	  // =====================================
+// MOBILE TOUCH DRAG-AND-DROP SUPPORT
+// =====================================
+
+let touchDragging = null;
+let touchStartY = 0;
+
+function getCardAtTouch(y) {
+  const cards = Array.from(songListEl.children);
+  return cards.find(card => {
+    const rect = card.getBoundingClientRect();
+    return y > rect.top && y < rect.bottom;
+  });
+}
+
+songListEl.addEventListener("touchstart", function(e) {
+  const touch = e.touches[0];
+  const card = e.target.closest(".song-item");
+  if (!card) return;
+
+  touchDragging = card;
+  touchStartY = touch.clientY;
+
+  card.classList.add("dragging");
+
+  e.preventDefault(); // prevent scrolling
+}, { passive: false });
+
+songListEl.addEventListener("touchmove", function(e) {
+  if (!touchDragging) return;
+
+  const touch = e.touches[0];
+  const overCard = getCardAtTouch(touch.clientY);
+  if (!overCard || overCard === touchDragging) return;
+
+  const cards = Array.from(songListEl.children);
+  const dragIndex = cards.indexOf(touchDragging);
+  const overIndex = cards.indexOf(overCard);
+
+  if (dragIndex < overIndex) {
+    songListEl.insertBefore(touchDragging, overCard.nextSibling);
+  } else {
+    songListEl.insertBefore(touchDragging, overCard);
+  }
+
+  e.preventDefault();
+}, { passive: false });
+
+songListEl.addEventListener("touchend", function() {
+  if (!touchDragging) return;
+  touchDragging.classList.remove("dragging");
+  touchDragging = null;
+});
+
 
 function playSong(file, label) {
   // ALWAYS reset all play buttons and playing highlights
@@ -1017,6 +1071,7 @@ function playSong_old(file, label) {
   </script>
 </body>
 </html>
+
 
 
 

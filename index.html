@@ -329,6 +329,7 @@
       cursor: move;
       user-select: none;
       transition: background 0.1s ease, transform 0.1s ease, box-shadow 0.1s ease;
+	  touch-action: none;    /* allow custom dragging */
     }
 
     .song-item:last-child { margin-bottom: 0; }
@@ -1016,6 +1017,7 @@ function playSong_old(file, label) {
   </script>
 </body>
 </html>
+
 
 
 
